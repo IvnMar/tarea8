@@ -1,0 +1,567 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil - {{ usuario.usuario }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        padding: 2rem 0;
+    }
+
+    .profile-header {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+
+    .breadcrumb {
+        background-color: var(--light-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+        color: var(--text-secondary);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+        color: var(--primary-color);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--text-primary);
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-value {
+        color: var(--text-primary);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .edit-form {
+        display: none;
+        background-color: var(--light-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-inactive {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .security-item {
+        background-color: var(--light-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .security-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .security-item i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+
+    .timeline-content {
+        background-color: var(--light-bg);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem 0;
+        }
+        
+        .profile-header {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'dashboard' %}">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <i class="fas fa-user me-1"></i>Mi Perfil
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h2 class="h4 mb-2">{{ usuario.usuario }}</h2>
+                    <p class="mb-1 opacity-75">
+                        <i class="fas fa-envelope me-2"></i>{{ usuario.correo }}
+                    </p>
+                    <p class="mb-0 opacity-75">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Miembro desde {{ usuario.fecha_creacion|date:"F Y" }}
+                    </p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <button class="btn btn-outline-light" onclick="toggleEditMode()">
+                        <i class="fas fa-edit me-2"></i>Editar Perfil
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Profile Information -->
+            <div class="col-lg-8">
+                <!-- View Mode -->
+                <div id="viewMode" class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-id-card me-2"></i>
+                            Información Personal
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-at"></i>
+                                Nombre de Usuario
+                            </span>
+                            <span class="info-value">{{ usuario.usuario }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-envelope"></i>
+                                Correo Electrónico
+                            </span>
+                            <span class="info-value">{{ usuario.correo }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-calendar-check"></i>
+                                Fecha de Registro
+                            </span>
+                            <span class="info-value">{{ usuario.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-clock"></i>
+                                Antigüedad
+                            </span>
+                            <span class="info-value">{{ usuario.fecha_creacion|timesince }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-toggle-on"></i>
+                                Estado de Cuenta
+                            </span>
+                            <span class="info-value">
+                                {% if usuario.activo %}
+                                    <span class="status-badge status-active">
+                                        <i class="fas fa-check fa-xs"></i>
+                                        Activa
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge status-inactive">
+                                        <i class="fas fa-times fa-xs"></i>
+                                        Inactiva
+                                    </span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Mode -->
+                <div id="editMode" class="edit-form">
+                    <h5 class="mb-3">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Información Personal
+                    </h5>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-at me-2"></i>Nombre de Usuario
+                            </label>
+                            <input type="text" class="form-control" id="username" 
+                                   value="{{ usuario.usuario }}" disabled>
+                            <small class="form-text text-muted">
+                                El nombre de usuario no se puede modificar
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                            </label>
+                            <input type="email" class="form-control" id="email" 
+                                   value="{{ usuario.correo }}" placeholder="Ingresa tu correo">
+                        </div>
+                        
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Activity Timeline -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Actividad Reciente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">Sesión iniciada</h6>
+                                        <p class="text-muted mb-0 small">Acceso desde navegador web</p>
+                                    </div>
+                                    <small class="text-muted">Hoy</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">Cuenta creada</h6>
+                                        <p class="text-muted mb-0 small">Registro completado exitosamente</p>
+                                    </div>
+                                    <small class="text-muted">{{ usuario.fecha_creacion|timesince }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Account Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Estadísticas
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="border-end">
+                                    <i class="fas fa-calendar-alt fa-2x text-primary mb-2"></i>
+                                    <h6 class="fw-bold">{{ usuario.fecha_creacion|timesince }}</h6>
+                                    <small class="text-muted">Tiempo activo</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div>
+                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                    <h6 class="fw-bold">100%</h6>
+                                    <small class="text-muted">Perfil completo</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>
+                            Acciones Rápidas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="showChangePassword()">
+                                <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                            </button>
+                            <button class="btn btn-outline-info" onclick="showLoginHistory()">
+                                <i class="fas fa-history me-2"></i>Historial de Accesos
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="downloadData()">
+                                <i class="fas fa-download me-2"></i>Descargar Mis Datos
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="showDeleteAccount()">
+                                <i class="fas fa-user-times me-2"></i>Eliminar Cuenta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Seguridad
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="security-item">
+                            <i class="fas fa-lock text-success"></i>
+                            <h6 class="fw-bold">Contraseña</h6>
+                            <p class="text-muted small mb-1">Última actualización: Nunca</p>
+                            <span class="status-badge" style="background-color: #fefce8; color: #a16207;">
+                                Recomendado actualizar
+                            </span>
+                        </div>
+                        <div class="security-item">
+                            <i class="fas fa-envelope-open-text text-primary"></i>
+                            <h6 class="fw-bold">Email Verificado</h6>
+                            <p class="text-muted small mb-1">Estado: Verificado</p>
+                            <span class="status-badge status-active">
+                                <i class="fas fa-check fa-xs"></i>
+                                Confirmado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Contraseña Actual</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Confirmar Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="changePassword()">
+                    <i class="fas fa-save me-2"></i>Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleEditMode() {
+        const viewMode = document.getElementById('viewMode');
+        const editMode = document.getElementById('editMode');
+        
+        if (editMode.style.display === 'none' || editMode.style.display === '') {
+            viewMode.style.display = 'none';
+            editMode.style.display = 'block';
+        } else {
+            viewMode.style.display = 'block';
+            editMode.style.display = 'none';
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById('viewMode').style.display = 'block';
+        document.getElementById('editMode').style.display = 'none';
+        document.getElementById('email').value = '{{ usuario.correo }}';
+    }
+
+    function saveProfile() {
+        const email = document.getElementById('email').value;
+        
+        if (!email || !email.includes('@')) {
+            alert('Por favor ingresa un correo electrónico válido.');
+            return;
+        }
+        
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            alert('Perfil actualizado exitosamente.\n\nEn una aplicación real, esta información se guardaría en la base de datos.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            toggleEditMode();
+        }, 1500);
+    }
+
+    function showChangePassword() {
+        const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+        modal.show();
+    }
+
+    function changePassword() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('Por favor completa todos los campos.');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            alert('Las contraseñas nuevas no coinciden.');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            alert('La nueva contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+        
+        alert('Contraseña actualizada exitosamente.');
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+        modal.hide();
+        document.getElementById('changePasswordForm').reset();
+    }
+
+    function showLoginHistory() {
+        alert('Historial de Accesos\n\nAccesos Recientes:\n• Hoy 14:30 - Navegador Chrome\n• Hoy 09:15 - Navegador Chrome\n• Ayer 20:45 - Navegador Firefox\n\nUbicaciones:\n• Ciudad de México, México\n\nSeguridad:\n• No se detectaron accesos sospechosos\n\n(Esta es una versión de demostración)');
+    }
+
+    function downloadData() {
+        alert('Descarga de Datos Personales\n\nInformación de Usuario:\n• Usuario: {{ usuario.usuario }}\n• Email: {{ usuario.correo }}\n• Fecha de registro: {{ usuario.fecha_creacion|date:"d/m/Y H:i" }}\n\nEn una aplicación real, esto generaría un archivo descargable con toda tu información.');
+    }
+
+    function showDeleteAccount() {
+        const confirmDelete = confirm('ADVERTENCIA: Eliminar Cuenta\n\nEsta acción NO se puede deshacer. Al eliminar tu cuenta:\n\n• Perderás acceso permanente\n• Se eliminarán todos tus datos\n• No podrás recuperar la información\n\n¿Estás COMPLETAMENTE seguro?\n\n(Esta es una versión de demostración, no se eliminará realmente)');
+        
+        if (confirmDelete) {
+            const finalConfirm = confirm('CONFIRMACIÓN FINAL\n\n¿Continuar con la eliminación de la cuenta?');
+            
+            if (finalConfirm) {
+                alert('En una aplicación real, tu cuenta habría sido eliminada.\n\n(Esta es solo una demostración)');
+            }
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión - Django PostgreSQL App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-card {
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-icon {
+        width: 60px;
+        height: 60px;
+        background-color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+    }
+
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+
+    .form-floating .form-control {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .form-floating label {
+        padding: 1rem 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 0.75rem;
+        font-weight: 500;
+    }
+
+    .demo-users {
+        background-color: var(--light-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .demo-user {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .demo-user:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(37, 99, 235, 0.05);
+    }
+
+    .text-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .text-link:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    .divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: var(--border-color);
+    }
+
+    .divider span {
+        background-color: var(--card-bg);
+        padding: 0 1rem;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="login-card">
+                    <!-- Header -->
+                    <div class="login-header">
+                        <div class="login-icon">
+                            <i class="fas fa-user fa-lg"></i>
+                        </div>
+                        <h2 class="h4 mb-2">Iniciar Sesión</h2>
+                        <p class="text-muted">Ingresa a tu cuenta para continuar</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="card">
+                        <div class="card-body">
+                            {% if form %}
+                            <form method="post" id="loginForm">
+                                {% csrf_token %}
+                                
+                                <!-- Usuario -->
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="{{ form.usuario.id_for_label }}"
+                                           name="{{ form.usuario.name }}"
+                                           placeholder="Usuario"
+                                           required
+                                           value="{{ form.usuario.value|default:'' }}">
+                                    <label for="{{ form.usuario.id_for_label }}">
+                                        <i class="fas fa-user me-2"></i>Usuario
+                                    </label>
+                                    {% if form.usuario.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.usuario.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Contraseña -->
+                                <div class="form-floating">
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="{{ form.contrasena.id_for_label }}"
+                                           name="{{ form.contrasena.name }}"
+                                           placeholder="Contraseña"
+                                           required>
+                                    <label for="{{ form.contrasena.id_for_label }}">
+                                        <i class="fas fa-lock me-2"></i>Contraseña
+                                    </label>
+                                    {% if form.contrasena.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.contrasena.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Remember Me & Forgot Password -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                                        <label class="form-check-label small text-muted" for="rememberMe">
+                                            Recordarme
+                                        </label>
+                                    </div>
+                                    <a href="#" class="text-link small">¿Olvidaste tu contraseña?</a>
+                                </div>
+
+                                <!-- Errores del formulario -->
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-danger">
+                                        {% for error in form.non_field_errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-login">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                                </button>
+                            </form>
+                            {% else %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Error: No se pudo cargar el formulario.
+                            </div>
+                            {% endif %}
+
+                            <!-- Divider -->
+                            <div class="divider">
+                                <span>o</span>
+                            </div>
+
+                            <!-- Demo Users Toggle -->
+                            <div class="text-center">
+                                <button type="button" 
+                                        class="btn btn-outline-secondary btn-sm" 
+                                        onclick="toggleDemoUsers()">
+                                    <i class="fas fa-users me-1"></i>Ver usuarios de prueba
+                                </button>
+                            </div>
+
+                            <!-- Demo Users (hidden by default) -->
+                            <div class="demo-users" id="demoUsers" style="display: none;">
+                                <h6 class="small fw-bold mb-3 text-muted">
+                                    <i class="fas fa-info-circle me-2"></i>Usuarios de Prueba
+                                </h6>
+                                <div class="demo-user" onclick="fillLogin('admin', 'admin123')">
+                                    <span>
+                                        <i class="fas fa-user-shield me-2 text-warning"></i>
+                                        <strong>admin</strong>
+                                    </span>
+                                    <small class="text-muted">Administrador</small>
+                                </div>
+                                <div class="demo-user" onclick="fillLogin('usuario1', 'password123')">
+                                    <span>
+                                        <i class="fas fa-user me-2 text-primary"></i>
+                                        <strong>usuario1</strong>
+                                    </span>
+                                    <small class="text-muted">Usuario normal</small>
+                                </div>
+                                <div class="demo-user" onclick="fillLogin('test', 'test123')">
+                                    <span>
+                                        <i class="fas fa-user me-2 text-success"></i>
+                                        <strong>test</strong>
+                                    </span>
+                                    <small class="text-muted">Usuario de prueba</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="text-center mt-3">
+                        <p class="mb-2">
+                            <span class="text-muted">¿No tienes cuenta? </span>
+                            <a href="{% url 'register' %}" class="text-link">Regístrate aquí</a>
+                        </p>
+                        <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleDemoUsers() {
+        const demoUsers = document.getElementById('demoUsers');
+        if (demoUsers.style.display === 'none') {
+            demoUsers.style.display = 'block';
+        } else {
+            demoUsers.style.display = 'none';
+        }
+    }
+
+    function fillLogin(username, password) {
+        document.getElementById('{{ form.usuario.id_for_label }}').value = username;
+        document.getElementById('{{ form.contrasena.id_for_label }}').value = password;
+        
+        // Visual feedback
+        const userField = document.getElementById('{{ form.usuario.id_for_label }}');
+        const passField = document.getElementById('{{ form.contrasena.id_for_label }}');
+        
+        userField.style.borderColor = 'var(--success-color)';
+        passField.style.borderColor = 'var(--success-color)';
+        
+        setTimeout(() => {
+            userField.style.borderColor = '';
+            passField.style.borderColor = '';
+        }, 1500);
+    }
+
+    // Auto focus
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameField = document.getElementById('{{ form.usuario.id_for_label }}');
+        if (usernameField) {
+            usernameField.focus();
+        }
+    });
+</script>
+{% endblock %}

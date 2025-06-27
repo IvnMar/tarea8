@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Django PostgreSQL App{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row justify-content-center text-center mb-5">
+        <div class="col-lg-8">
+            <div class="mb-4">
+                <i class="fas fa-database fa-4x text-primary mb-3"></i>
+            </div>
+            <h1 class="display-5 fw-bold mb-4">Django PostgreSQL App</h1>
+            <p class="lead text-muted mb-4">
+                Una aplicación web simple y eficiente construida con tecnologías modernas
+            </p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <span class="badge bg-primary px-3 py-2">Django 4.x</span>
+                <span class="badge bg-success px-3 py-2">PostgreSQL</span>
+                <span class="badge bg-info px-3 py-2">Docker</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="row g-4 mb-5">
+        <!-- Login Card -->
+        <div class="col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
+                    </div>
+                    <h4 class="card-title mb-3">Iniciar Sesión</h4>
+                    <p class="card-text text-muted mb-4">
+                        ¿Ya tienes una cuenta? Accede a tu dashboard personalizado
+                    </p>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Card -->
+        <div class="col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                    </div>
+                    <h4 class="card-title mb-3">Crear Cuenta</h4>
+                    <p class="card-text text-muted mb-4">
+                        ¿Nuevo por aquí? Únete a nuestra plataforma hoy mismo
+                    </p>
+                    <a href="{% url 'register' %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Registrarse
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="h3 mb-3">Características</h2>
+            <p class="text-muted">Tecnologías modernas para una experiencia sólida</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Feature 1 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-database fa-2x text-primary mb-3"></i>
+                    </div>
+                    <h5 class="card-title">PostgreSQL</h5>
+                    <p class="card-text text-muted">
+                        Base de datos robusta y escalable
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fab fa-docker fa-2x text-info mb-3"></i>
+                    </div>
+                    <h5 class="card-title">Docker</h5>
+                    <p class="card-text text-muted">
+                        Contenedores para desarrollo ágil
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fab fa-python fa-2x text-success mb-3"></i>
+                    </div>
+                    <h5 class="card-title">Django</h5>
+                    <p class="card-text text-muted">
+                        Framework web de alto rendimiento
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-shield-alt fa-2x text-warning mb-3"></i>
+                    </div>
+                    <h5 class="card-title">Seguridad</h5>
+                    <p class="card-text text-muted">
+                        Autenticación segura y protección de datos
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-mobile-alt fa-2x text-danger mb-3"></i>
+                    </div>
+                    <h5 class="card-title">Responsive</h5>
+                    <p class="card-text text-muted">
+                        Diseño adaptable para todos los dispositivos
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-bolt fa-2x text-secondary mb-3"></i>
+                    </div>
+                    <h5 class="card-title">Performance</h5>
+                    <p class="card-text text-muted">
+                        Optimizado para velocidad y eficiencia
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h3 class="mb-3">¿Listo para comenzar?</h3>
+                    <p class="text-muted mb-4">
+                        Únete a nuestra plataforma y descubre todas las funcionalidades disponibles
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'register' %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Crear Cuenta
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Ya tengo cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

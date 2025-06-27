@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Cuenta - Django PostgreSQL App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .register-card {
+        max-width: 450px;
+        width: 100%;
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .register-icon {
+        width: 60px;
+        height: 60px;
+        background-color: var(--success-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+    }
+
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+
+    .form-floating .form-control {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .form-floating label {
+        padding: 1rem 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 0.75rem;
+        font-weight: 500;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background-color: var(--light-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 0.875rem;
+    }
+
+    .strength-bar {
+        height: 4px;
+        background-color: var(--border-color);
+        border-radius: 2px;
+        margin: 0.5rem 0;
+        overflow: hidden;
+    }
+
+    .strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak { background-color: var(--danger-color); width: 25%; }
+    .strength-fair { background-color: var(--warning-color); width: 50%; }
+    .strength-good { background-color: var(--success-color); width: 75%; }
+    .strength-strong { background-color: #059669; width: 100%; }
+
+    .requirements {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .requirements li {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin: 0.25rem 0;
+        transition: color 0.2s ease;
+    }
+
+    .requirements li.valid {
+        color: var(--success-color);
+    }
+
+    .requirements li i {
+        width: 12px;
+        margin-right: 0.5rem;
+    }
+
+    .form-check {
+        margin: 1rem 0;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .text-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .text-link:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    .password-match {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="register-card">
+                    <!-- Header -->
+                    <div class="register-header">
+                        <div class="register-icon">
+                            <i class="fas fa-user-plus fa-lg"></i>
+                        </div>
+                        <h2 class="h4 mb-2">Crear Cuenta Nueva</h2>
+                        <p class="text-muted">Únete a nuestra plataforma hoy mismo</p>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div class="card">
+                        <div class="card-body">
+                            {% if form %}
+                            <form method="post" id="registerForm">
+                                {% csrf_token %}
+                                
+                                <!-- Usuario -->
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="{{ form.usuario.id_for_label }}"
+                                           name="{{ form.usuario.name }}"
+                                           placeholder="Usuario"
+                                           required
+                                           value="{{ form.usuario.value|default:'' }}">
+                                    <label for="{{ form.usuario.id_for_label }}">
+                                        <i class="fas fa-at me-2"></i>Nombre de Usuario
+                                    </label>
+                                    {% if form.usuario.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.usuario.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Solo letras, números y los caracteres @/./+/-/_
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="form-floating">
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="{{ form.correo.id_for_label }}"
+                                           name="{{ form.correo.name }}"
+                                           placeholder="Email"
+                                           required
+                                           value="{{ form.correo.value|default:'' }}">
+                                    <label for="{{ form.correo.id_for_label }}">
+                                        <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                                    </label>
+                                    {% if form.correo.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.correo.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Contraseña -->
+                                <div class="form-floating">
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="{{ form.contrasena.id_for_label }}"
+                                           name="{{ form.contrasena.name }}"
+                                           placeholder="Contraseña"
+                                           required
+                                           onkeyup="checkPasswordStrength(this.value)">
+                                    <label for="{{ form.contrasena.id_for_label }}">
+                                        <i class="fas fa-lock me-2"></i>Contraseña
+                                    </label>
+                                    {% if form.contrasena.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.contrasena.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Password Strength -->
+                                    <div class="password-strength" id="passwordStrength" style="display: none;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small text-muted">Seguridad:</span>
+                                            <span class="small fw-bold" id="strengthText">Débil</span>
+                                        </div>
+                                        <div class="strength-bar">
+                                            <div class="strength-fill" id="strengthFill"></div>
+                                        </div>
+                                        <ul class="requirements">
+                                            <li id="req-length">
+                                                <i class="fas fa-times"></i>Al menos 6 caracteres
+                                            </li>
+                                            <li id="req-letter">
+                                                <i class="fas fa-times"></i>Al menos una letra
+                                            </li>
+                                            <li id="req-number">
+                                                <i class="fas fa-times"></i>Al menos un número
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Confirmar Contraseña -->
+                                <div class="form-floating">
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="{{ form.confirmar_contrasena.id_for_label }}"
+                                           name="{{ form.confirmar_contrasena.name }}"
+                                           placeholder="Confirmar Contraseña"
+                                           required
+                                           onkeyup="checkPasswordMatch()">
+                                    <label for="{{ form.confirmar_contrasena.id_for_label }}">
+                                        <i class="fas fa-lock me-2"></i>Confirmar Contraseña
+                                    </label>
+                                    {% if form.confirmar_contrasena.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.confirmar_contrasena.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div id="passwordMatch" class="password-match" style="display: none;"></div>
+                                </div>
+
+                                <!-- Errores del formulario -->
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-danger">
+                                        {% for error in form.non_field_errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <!-- Terms and Conditions -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label small" for="terms">
+                                        Acepto los <a href="#" class="text-link" onclick="showTerms()">términos y condiciones</a> 
+                                        y la <a href="#" class="text-link" onclick="showPrivacy()">política de privacidad</a>
+                                    </label>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-success btn-register">
+                                    <i class="fas fa-user-plus me-2"></i>Crear Mi Cuenta
+                                </button>
+                            </form>
+                            {% else %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Error: No se pudo cargar el formulario.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center mt-3">
+                        <p class="mb-2">
+                            <span class="text-muted">¿Ya tienes una cuenta? </span>
+                            <a href="{% url 'login' %}" class="text-link">Inicia sesión aquí</a>
+                        </p>
+                        <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function checkPasswordStrength(password) {
+        const strengthIndicator = document.getElementById('passwordStrength');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        
+        if (password.length === 0) {
+            strengthIndicator.style.display = 'none';
+            return;
+        }
+        
+        strengthIndicator.style.display = 'block';
+        
+        // Check requirements
+        const requirements = {
+            length: password.length >= 6,
+            letter: /[a-zA-Z]/.test(password),
+            number: /[0-9]/.test(password)
+        };
+        
+        // Update requirement indicators
+        updateRequirement('req-length', requirements.length);
+        updateRequirement('req-letter', requirements.letter);
+        updateRequirement('req-number', requirements.number);
+        
+        // Calculate strength
+        const score = Object.values(requirements).filter(Boolean).length;
+        const strengthClasses = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong'];
+        const strengthTexts = ['Débil', 'Regular', 'Buena', 'Fuerte'];
+        
+        strengthFill.className = 'strength-fill ' + (strengthClasses[score - 1] || 'strength-weak');
+        strengthText.textContent = strengthTexts[score - 1] || 'Muy débil';
+    }
+
+    function updateRequirement(id, isValid) {
+        const element = document.getElementById(id);
+        const icon = element.querySelector('i');
+        
+        if (isValid) {
+            element.classList.add('valid');
+            icon.className = 'fas fa-check';
+        } else {
+            element.classList.remove('valid');
+            icon.className = 'fas fa-times';
+        }
+    }
+
+    function checkPasswordMatch() {
+        const password = document.getElementById('{{ form.contrasena.id_for_label }}').value;
+        const confirmPassword = document.getElementById('{{ form.confirmar_contrasena.id_for_label }}').value;
+        const matchIndicator = document.getElementById('passwordMatch');
+        
+        if (confirmPassword.length === 0) {
+            matchIndicator.style.display = 'none';
+            return;
+        }
+        
+        matchIndicator.style.display = 'block';
+        
+        if (password === confirmPassword) {
+            matchIndicator.innerHTML = '<i class="fas fa-check me-1 text-success"></i><span class="text-success">Las contraseñas coinciden</span>';
+        } else {
+            matchIndicator.innerHTML = '<i class="fas fa-times me-1 text-danger"></i><span class="text-danger">Las contraseñas no coinciden</span>';
+        }
+    }
+
+    function showTerms() {
+        alert('Términos y condiciones:\n\n1. Uso responsable de la plataforma\n2. Protección de datos personales\n3. Prohibido el spam o contenido malicioso\n4. Respeto a otros usuarios\n\n(Esta es una versión de demostración)');
+    }
+
+    function showPrivacy() {
+        alert('Política de privacidad:\n\n• Tus datos están protegidos\n• No compartimos información personal\n• Usamos cookies para mejorar la experiencia\n• Puedes solicitar eliminación de datos\n\n(Esta es una versión de demostración)');
+    }
+
+    // Form submission with validation
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const password = document.getElementById('{{ form.contrasena.id_for_label }}').value;
+        const confirmPassword = document.getElementById('{{ form.confirmar_contrasena.id_for_label }}').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden. Por favor, verifica e intenta nuevamente.');
+            return;
+        }
+    });
+
+    // Auto focus
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameField = document.getElementById('{{ form.usuario.id_for_label }}');
+        if (usernameField) {
+            usernameField.focus();
+        }
+    });
+</script>
+{% endblock %}
